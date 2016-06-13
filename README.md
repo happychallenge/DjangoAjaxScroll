@@ -176,17 +176,16 @@ post/post_list_ajax.html 은 다음과 같이 구현을 한다.
 그냥 post/post_list.html 에서 Data Query 를 뿌려 주는 부분을 저장하면 된다.
 
     {% if post_list %}
-
-    {% for post in post_list %}
-    <div class=”col-xs-12 col-sm-6″>
-    <h2>{{ post.title }}</h2>
-    <p>{{ post.content | truncatewords:”50″ }}</p>
-    <p><a class=”btn btn-default” href=”{% url ‘post_detail’ post.id %}” role=”button”>View details »</a></p>
-    </div>
-    {% endfor %}
+        {% for post in post_list %}
+            <div class=”col-xs-12 col-sm-6″>
+            <h2>{{ post.title }}</h2>
+            <p>{{ post.content | truncatewords:”50″ }}</p>
+            <p><a class=”btn btn-default” href=”{% url ‘post_detail’ post.id %}” role=”button”>View details »</a></p>
+            </div>
+        {% endfor %}
 
     {% else %}
-    <p>No Data</p>
+        <p>No Data</p>
     {% endif %}
 
 urls.py 가 빠져서 추가를 합니다.
