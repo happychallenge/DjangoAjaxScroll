@@ -8,153 +8,153 @@
 
 우선 models.py 를 구현한다.
 
-class Post(models.Model):
-“””docstring for Post”””
-“”” Post “””
-    title = models.CharField(max_length=30)
-    content = models.TextField()
-    read = models.IntegerField(default=0)
-    likes = models.IntegerField(default=0)
-    updated_date = models.DateTimeField(auto_now_add=False, auto_now=True)
-    created_date = models.DateTimeField(auto_now_add=True, auto_now=False)
+    class Post(models.Model):
+    “””docstring for Post”””
+    “”” Post “””
+        title = models.CharField(max_length=30)
+        content = models.TextField()
+        read = models.IntegerField(default=0)
+        likes = models.IntegerField(default=0)
+        updated_date = models.DateTimeField(auto_now_add=False, auto_now=True)
+        created_date = models.DateTimeField(auto_now_add=True, auto_now=False)
 
 views.py 에 다음과 같이 두개의 view function을 구현한다.
 
-def post_list(request):
-    post_list = Post.objects.all().order_by(‘-created_date’)
-    paginator = Paginator(post_list, 10)
-    page = request.POST.get(‘page’)
+    def post_list(request):
+        post_list = Post.objects.all().order_by(‘-created_date’)
+        paginator = Paginator(post_list, 10)
+        page = request.POST.get(‘page’)
 
-    try:
-        post_list = paginator.page(page)
-    except PageNotAnInteger:
-        post_list = paginator.page(1)
-    except EmptyPage:
-        post_list = paginator.page(paginator.num_pages)
+        try:
+            post_list = paginator.page(page)
+        except PageNotAnInteger:
+            post_list = paginator.page(1)
+        except EmptyPage:
+            post_list = paginator.page(paginator.num_pages)
 
-    context = {‘post_list’:post_list}
-    return render(request, ‘post/post_list.html’, context)
+        context = {‘post_list’:post_list}
+        return render(request, ‘post/post_list.html’, context)
 
-def post_list_ajax(request): #Ajax 로 호출하는 함수
-    post_list = Post.objects.all().order_by(‘-created_date’)
-    paginator = Paginator(post_list, 10)
-    page = request.POST.get(‘page’)
+    def post_list_ajax(request): #Ajax 로 호출하는 함수
+        post_list = Post.objects.all().order_by(‘-created_date’)
+        paginator = Paginator(post_list, 10)
+        page = request.POST.get(‘page’)
 
-    try:
-        post_list = paginator.page(page)
-    except PageNotAnInteger:
-        post_list = paginator.page(1)
-    except EmptyPage:
-        post_list = paginator.page(paginator.num_pages)
+        try:
+            post_list = paginator.page(page)
+        except PageNotAnInteger:
+            post_list = paginator.page(1)
+        except EmptyPage:
+            post_list = paginator.page(paginator.num_pages)
 
-    context = {‘post_list’:post_list}
-    return render(request, ‘post/post_list_ajax.html’, context) #Ajax 로 호출하는 템플릿은 _ajax로 표시.
+        context = {‘post_list’:post_list}
+        return render(request, ‘post/post_list_ajax.html’, context) #Ajax 로 호출하는 템플릿은 _ajax로 표시.
 
 post/post_list.html 은 다음과 같이 구현을 한다.
 
-{% extends “base.html” %}
+    {% extends “base.html” %}
 
-{% comment %} Title {% endcomment %}
-{% block title %} POST’s List {% endblock title %}
+    {% comment %} Title {% endcomment %}
+    {% block title %} POST’s List {% endblock title %}
 
-{% comment %} Search {% endcomment %}
-{% block search %}
-<div class=”col-sm-10″>
-{% csrf_token %}
-<input type=”text” class=”form-control input-md” id=”searchID” placeholder=”검색어를 입력하시요.” autofocus>
-</div>
-<div class=”col-sm-2″>
-<button type=”button” class=”btn btn-primary btn-md btn-block”>Search
-</div>
-<br />
-<url id=”search_result_ajax”>
-</url>
-<br />
+    {% comment %} Search {% endcomment %}
+    {% block search %}
+    <div class=”col-sm-10″>
+    {% csrf_token %}
+    <input type=”text” class=”form-control input-md” id=”searchID” placeholder=”검색어를 입력하시요.” autofocus>
+    </div>
+    <div class=”col-sm-2″>
+    <button type=”button” class=”btn btn-primary btn-md btn-block”>Search
+    </div>
+    <br />
+    <url id=”search_result_ajax”>
+    </url>
+    <br />
 
-<script type=”text/javascript”>
-    var token = $(‘input[name=”csrfmiddlewaretoken”]’).prop(‘value’);
-    $(function() {
-        $(‘#searchID’).keyup(function(){
-        $.ajax( {
-            type : ‘POST’,
-            url: “{% url ‘post_search’ %}”,
-            data: {
-            ‘search_text’: $(‘#searchID’).val(),
-            ‘csrfmiddlewaretoken’: token
-        },
-        success: searchSuccess,
-        dataType: ‘html’
+    <script type=”text/javascript”>
+        var token = $(‘input[name=”csrfmiddlewaretoken”]’).prop(‘value’);
+        $(function() {
+            $(‘#searchID’).keyup(function(){
+            $.ajax( {
+                type : ‘POST’,
+                url: “{% url ‘post_search’ %}”,
+                data: {
+                ‘search_text’: $(‘#searchID’).val(),
+                ‘csrfmiddlewaretoken’: token
+            },
+            success: searchSuccess,
+            dataType: ‘html’
+            });
+            });
         });
-        });
-    });
 
-    function searchSuccess(data, textStatus, jqXHR) {
-        $(‘#search_result_ajax’).html(data);
-    }
-</script>
-{% endblock search %}
+        function searchSuccess(data, textStatus, jqXHR) {
+            $(‘#search_result_ajax’).html(data);
+        }
+    </script>
+    {% endblock search %}
 
-{% comment %} Main {% endcomment %}
-{% block main %}
-<div class=”row”>
+    {% comment %} Main {% endcomment %}
+    {% block main %}
+    <div class=”row”>
 
-{% if post_list %}
+    {% if post_list %}
 
-{% for post in post_list %}
-<div class=”col-xs-12 col-sm-6″>
-<h2>{{ post.title }}</h2>
-<p>{{ post.content | truncatewords:”50″ }}
+    {% for post in post_list %}
+    <div class=”col-xs-12 col-sm-6″>
+    <h2>{{ post.title }}</h2>
+    <p>{{ post.content | truncatewords:”50″ }}
 
-<p><a class=”btn btn-default” href=”{% url ‘post_detail’ post.id %}” role=”button”>View details »</a></p>
-</div>
-{% endfor %}
+    <p><a class=”btn btn-default” href=”{% url ‘post_detail’ post.id %}” role=”button”>View details »</a></p>
+    </div>
+    {% endfor %}
 
-{% else %}
-<p>No Data</p>
-{% endif %}
+    {% else %}
+    <p>No Data</p>
+    {% endif %}
 
-</div>
-<div id=”post_list_ajax”></div> **Ajax 결과물을 추가할 곳
-<input id=”page” type=”hidden” value=”2″> **페이지 정보를 입력할 곳
-<button id=”callmorepost” type=”button” class=”btn btn-primary btn-block”>More Post</button> **페이지 스크롤 이벤트가 작동하지 않을 경우 클릭함.
+    </div>
+    <div id=”post_list_ajax”></div> **Ajax 결과물을 추가할 곳
+    <input id=”page” type=”hidden” value=”2″> **페이지 정보를 입력할 곳
+    <button id=”callmorepost” type=”button” class=”btn btn-primary btn-block”>More Post</button> **페이지 스크롤 이벤트가 작동하지 않을 경우 클릭함.
 
-<script>
-    //scroll event
-    $(‘#callmorepost’).click(function(){
-        var page = $(“#page”).val();
-        callMorePostAjax(page);
-        $(“#page”).val(parseInt(page)+1);
-    });
-
-    $(window).scroll(function(){
-        var scrollHeight = $(window).scrollTop() + $(window).height();
-        var documentHeight = $(document).height();
-        
-        if (scrollHeight + 300 >= documentHeight){
+    <script>
+        //scroll event
+        $(‘#callmorepost’).click(function(){
             var page = $(“#page”).val();
             callMorePostAjax(page);
             $(“#page”).val(parseInt(page)+1);
-        }
-    });
-
-    function callMorePostAjax(page) {
-        $.ajax( {
-        type : ‘POST’,
-        url: “{% url ‘post_list_ajax’ %}”,
-        data: {
-        ‘page’: page,
-        ‘csrfmiddlewaretoken’: token
-        },
-        success: addMorePostAjax,
-        dataType: ‘html’
         });
-    }
 
-    function addMorePostAjax(data, textStatus, jqXHR) {
-        $(‘#post_list_ajax’).append(data);
-    } 
-</script>
-{% endblock main %}
+        $(window).scroll(function(){
+            var scrollHeight = $(window).scrollTop() + $(window).height();
+            var documentHeight = $(document).height();
+            
+            if (scrollHeight + 300 >= documentHeight){
+                var page = $(“#page”).val();
+                callMorePostAjax(page);
+                $(“#page”).val(parseInt(page)+1);
+            }
+        });
+
+        function callMorePostAjax(page) {
+            $.ajax( {
+            type : ‘POST’,
+            url: “{% url ‘post_list_ajax’ %}”,
+            data: {
+            ‘page’: page,
+            ‘csrfmiddlewaretoken’: token
+            },
+            success: addMorePostAjax,
+            dataType: ‘html’
+            });
+        }
+
+        function addMorePostAjax(data, textStatus, jqXHR) {
+            $(‘#post_list_ajax’).append(data);
+        } 
+    </script>
+    {% endblock main %}
 
 마지막으로 무한 스크롤을 구현할 때
 if ($(window).scrollTop() == $(document).height() – $(window).height()){
@@ -175,19 +175,19 @@ $(“#page”).val(parseInt(page)+1);
 post/post_list_ajax.html 은 다음과 같이 구현을 한다.
 그냥 post/post_list.html 에서 Data Query 를 뿌려 주는 부분을 저장하면 된다.
 
-{% if post_list %}
+    {% if post_list %}
 
-{% for post in post_list %}
-<div class=”col-xs-12 col-sm-6″>
-<h2>{{ post.title }}</h2>
-<p>{{ post.content | truncatewords:”50″ }}</p>
-<p><a class=”btn btn-default” href=”{% url ‘post_detail’ post.id %}” role=”button”>View details »</a></p>
-</div>
-{% endfor %}
+    {% for post in post_list %}
+    <div class=”col-xs-12 col-sm-6″>
+    <h2>{{ post.title }}</h2>
+    <p>{{ post.content | truncatewords:”50″ }}</p>
+    <p><a class=”btn btn-default” href=”{% url ‘post_detail’ post.id %}” role=”button”>View details »</a></p>
+    </div>
+    {% endfor %}
 
-{% else %}
-<p>No Data</p>
-{% endif %}
+    {% else %}
+    <p>No Data</p>
+    {% endif %}
 
 해당 소스는 https://github.com/happychallenge/DjangoAjaxScroll 에서 다운로드가 가능합니다.
 감사합니다.
