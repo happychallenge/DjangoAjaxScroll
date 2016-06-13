@@ -1,0 +1,8 @@
+{% if post_list.count > 0 %}
+	{% for post in post_list %}
+		{% csrf_token %}
+		<li><a href="{% url 'post_detail' post.id %}">{{ post.title }}</a></li>
+	{% endfor %}
+{% else %}
+
+{% endif %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% comment %} Title {% endcomment %}
+  {% block title %} Namju's Detail {% endblock title %}
+
+
+{% comment %} Main {% endcomment %}
+  {% block main %}
+    <div class="row">
+      <div class="col-xs-12 col-sm-12">
+        <h2>{{ post.title }}</h2>
+        <p>{{ post.content | linebreaks }}</p>
+        <p> 
+          {{ post.created_date }}
+          <a href="#" id="">Likes: <span class="badge" >{{ post.read }}</span></a>
+          <a href="#" id="">Likes: <span class="badge" id="likes">{{ post.likes }}</span></a>
+          <button type="button" class="btn btn-primary" id="liked">좋아요</button>
+          {% csrf_token %}
+        </p> 
+      </div>
+    </div><!--/row-->
+
+    <script type="text/javascript">
+      var token = $('input[name="csrfmiddlewaretoken"]').prop('value');
+      $(function() {       
+        $('#liked').click(function() {
+          $.ajax({
+            type: 'POST',
+            url: "{% url 'post_likes' post.id %}",
+            data: {
+              'csrfmiddlewaretoken': token
+            },
+            success: postLike,
+            dataType: 'html'
+          });
+        });
+      });
+
+      function postLike(data, textStatus, jqXHR) {
+        $('#likes').html(data)
+      }
+    </script>
+  {% endblock main %}
+
+{% comment %} Right Menu {% endcomment %}
+  {% block rightmenu %}
+    <div class="list-group">
+      <a href="#" class="list-group-item active">Link</a>
+      <a href="#" class="list-group-item">Link</a>
+      <a href="#" class="list-group-item">Link</a>
+      <a href="#" class="list-group-item">Link</a>
+      <a href="#" class="list-group-item">Link</a>
+      <a href="#" class="list-group-item">Link</a>
+      <a href="#" class="list-group-item">Link</a>
+      <a href="#" class="list-group-item">Link</a>
+      <a href="#" class="list-group-item">Link</a>
+      <a href="#" class="list-group-item">Link</a>
+    </div>
+  {% endblock rightmenu %}

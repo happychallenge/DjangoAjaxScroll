@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% comment %} Title {% endcomment %}
+  {% block title %} Namju's List {% endblock title %}
+
+{% comment %} Search {% endcomment %}
+  {% block search %}
+    <div class="col-sm-10">
+      {% csrf_token %}
+      <input type="text" class="form-control input-md" id="searchID" placeholder="검색어를 입력하시요." autofocus>
+     
+    </div>
+    <div class="col-sm-2">
+      <button type="button" class="btn btn-primary btn-md btn-block">Search</button>
+    </div>
+    <br />
+    <url id="search_result_ajax">
+    </url>
+    <br />
+
+    <script type="text/javascript"> 
+    var token = $('input[name="csrfmiddlewaretoken"]').prop('value');
+    $(function() {
+      $('#searchID').keyup(function(){
+        $.ajax( {
+          type : 'POST',
+          url: "{% url 'post_search' %}",
+          data: {
+            'search_text': $('#searchID').val(),
+            'csrfmiddlewaretoken': token
+          },
+          success: searchSuccess,
+          dataType: 'html'
+        });
+      });
+    });
+
+    function searchSuccess(data, textStatus, jqXHR) {
+      $('#search_result_ajax').html(data);
+    } 
+    </script>
+  {% endblock search %}
+
+{% comment %} Main {% endcomment %}
+  {% block main %}
+    <div class="row">
+
+    {% if post_list %}
+      
+      {% for post in post_list %}
+      <div class="col-xs-12 col-sm-6">
+        <h2>{{ post.title }}</h2>
+        <p>{{ post.content | truncatewords:"50" }}</p>
+        <p><a class="btn btn-default" href="{% url 'post_detail' post.id %}" role="button">View details &raquo;</a></p>
+      </div>
+      {% endfor %} 
+      
+    {% else %}
+      <p>No Data</p>
+    {% endif %}
+    </div><!--/row-->
+    <div id="post_list_ajax"></div>
+    <input id="page" type="hidden" value="2">
+    <button id="callmorepost" type="button" class="btn btn-primary btn-block">More Post</button>
+    <script>
+      //scroll event
+      $('#callmorepost').click(function(){
+          var page = $("#page").val();
+          callMoarePostAjax(page);
+          $("#page").val(parseInt(page)+1);
+      });
+
+      $(window).scroll(function(){
+        var scrollHeight = $(window).scrollTop() + $(window).height();
+        var documentHeight = $(document).height();
+        //if ($(window).scrollTop() == $(document).height() - $(window).height()){
+        if (scrollHeight + 300 >= documentHeight){
+          var page = $("#page").val();
+          callMoarePostAjax(page);
+          $("#page").val(parseInt(page)+1);
+        }
+      });
+
+      function callMoarePostAjax(page) {
+        $.ajax( {
+          type : 'POST',
+          url: "{% url 'post_list_ajax' %}",
+          data: {
+            'page': page,
+            'csrfmiddlewaretoken': token
+          },
+          success: addMorePostAjax,
+          dataType: 'html'
+        });
+      }
+
+      function addMorePostAjax(data, textStatus, jqXHR) {
+        $('#post_list_ajax').append(data);
+
+      } 
+    </script>
+  {% endblock main %}
+
+{% comment %} Right Menu {% endcomment %}
+  {% block rightmenu %}
+  <div class="list-group" style="position:fixed">
+    <a href="#" class="list-group-item list-group-item-success active">Link HHHHHHHHHHHHHHH</a>
+    <a href="#" class="list-group-item list-group-item-success">Link</a>
+    <a href="#" class="list-group-item list-group-item-success">Link</a>
+    <a href="#" class="list-group-item list-group-item-success">Link</a>
+    <a href="#" class="list-group-item list-group-item-success">Link</a>
+    <a href="#" class="list-group-item list-group-item-success">Link</a>
+    <a href="#" class="list-group-item list-group-item-success">Link</a>
+    <a href="#" class="list-group-item list-group-item-success">Link</a>
+    <a href="#" class="list-group-item list-group-item-success">Link</a>
+    <a href="#" class="list-group-item list-group-item-success">Link</a>
+  </div>
+  {% endblock rightmenu %}
