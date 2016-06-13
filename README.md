@@ -189,5 +189,18 @@ post/post_list_ajax.html 은 다음과 같이 구현을 한다.
     <p>No Data</p>
     {% endif %}
 
+urls.py 가 빠져서 추가를 합니다.
+
+    urlpatterns = [
+        url(r'^list/$', views.post_list, name='post_list'),
+        url(r'^create/$', views.post_create, name='post_create'),
+        url(r'^detail/(?P<post_id>[0-9]+)/$', views.post_detail, name='post_detail'),
+        url(r'^update/(?P<post_id>[0-9]+)/$', views.post_update, name='post_update'),
+        url(r'^delete/(?P<post_id>[0-9]+)/$', views.post_delete, name='post_delete'),
+        url(r'^search/$', views.post_search, name='post_search'),                       #Ajax 
+        url(r'^likes/(?P<post_id>[0-9]+)/$', views.post_likes, name='post_likes'),      #Ajax 
+        url(r'^list/ajax/$', views.post_list_ajax, name='post_list_ajax'),              #Ajax 
+    ]
+
 해당 소스는 https://github.com/happychallenge/DjangoAjaxScroll 에서 다운로드가 가능합니다.
 감사합니다.
