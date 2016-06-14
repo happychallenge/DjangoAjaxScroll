@@ -8,6 +8,7 @@
 
 우선 models.py 를 구현한다.
 
+```python
     class Post(models.Model):
     “””docstring for Post”””
     “”” Post “””
@@ -17,9 +18,11 @@
         likes = models.IntegerField(default=0)
         updated_date = models.DateTimeField(auto_now_add=False, auto_now=True)
         created_date = models.DateTimeField(auto_now_add=True, auto_now=False)
+```
 
 views.py 에 다음과 같이 두개의 view function을 구현한다.
 
+```python
     def post_list(request):
         post_list = Post.objects.all().order_by(‘-created_date’)
         paginator = Paginator(post_list, 10)
@@ -49,9 +52,11 @@ views.py 에 다음과 같이 두개의 view function을 구현한다.
 
         context = {‘post_list’:post_list}
         return render(request, ‘post/post_list_ajax.html’, context) #Ajax 로 호출하는 템플릿은 _ajax로 표시.
+```
 
 post/post_list.html 은 다음과 같이 구현을 한다.
 
+```html
     {% extends “base.html” %}
 
     {% comment %} Title {% endcomment %}
@@ -156,6 +161,8 @@ post/post_list.html 은 다음과 같이 구현을 한다.
     </script>
     {% endblock main %}
 
+```
+
 마지막으로 무한 스크롤을 구현할 때
 if ($(window).scrollTop() == $(document).height() – $(window).height()){
 를 사용하지 않았는데, 크롬 등에서 해당 Event 를 정확히 인식하지 못하는 경우가 있기 때문입니다.
@@ -175,6 +182,7 @@ $(“#page”).val(parseInt(page)+1);
 post/post_list_ajax.html 은 다음과 같이 구현을 한다.
 그냥 post/post_list.html 에서 Data Query 를 뿌려 주는 부분을 저장하면 된다.
 
+```html
     {% if post_list %}
         {% for post in post_list %}
             <div class=”col-xs-12 col-sm-6″>
@@ -187,9 +195,11 @@ post/post_list_ajax.html 은 다음과 같이 구현을 한다.
     {% else %}
         <p>No Data</p>
     {% endif %}
+```
 
 urls.py 가 빠져서 추가를 합니다.
 
+```python
     urlpatterns = [
         url(r'^list/$', views.post_list, name='post_list'),
         url(r'^create/$', views.post_create, name='post_create'),
@@ -200,6 +210,7 @@ urls.py 가 빠져서 추가를 합니다.
         url(r'^likes/(?P<post_id>[0-9]+)/$', views.post_likes, name='post_likes'),      #Ajax 
         url(r'^list/ajax/$', views.post_list_ajax, name='post_list_ajax'),              #Ajax 
     ]
+```
 
 해당 소스는 https://github.com/happychallenge/DjangoAjaxScroll 에서 다운로드가 가능합니다.
 감사합니다.
